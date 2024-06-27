@@ -1,3 +1,8 @@
-EMAIL=your-email-adress
-# Obtain Jira API Token here: https://id.atlassian.com/manage-profile/security/api-tokens
+# Create a Jira Service Management domain here: https://www.atlassian.com/software/jira/service-management/free
+JIRA_DOMAIN=your-domain
+# Use same email address used for Jira Service Management registration
+EMAIL=email@example.com
+# Get project key here: https://support.atlassian.com/jira-core-cloud/docs/work-with-issues-in-jira-cloud/#Workingwithissues-Projectkeys
+JIRA_PROJECT_KEY=e.g ALH
+# Obtain API Token here: https://id.atlassian.com/manage-profile/security/api-tokens
 API_KEY=your-api-token
