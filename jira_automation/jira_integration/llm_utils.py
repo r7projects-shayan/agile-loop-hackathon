@@ -1,6 +1,6 @@
 import google.generativeai as genai
 import os
-import re
+import json
 from jira import JIRA
 from dotenv import load_dotenv
 
@@ -9,7 +9,7 @@ load_dotenv()
 
 # Initialize the Gemini API
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"response_mime_type": "application/json"})
 
 def get_llm_response(prompt):
     response = model.generate_content(prompt)
@@ -17,25 +17,27 @@ def get_llm_response(prompt):
 
 def handle_prompt(prompt):
     llm_response = get_llm_response(prompt)
+    
     # Log the full response for debugging
     print("LLM Response:", llm_response)
     
-    # Define regex patterns for actions
-    view_issues_pattern = re.compile(r'view open issues', re.IGNORECASE)
-    create_issue_pattern = re.compile(r'create issue', re.IGNORECASE)
-    
-    # Check for "view open issues"
-    if view_issues_pattern.search(llm_response):
-        return view_issues()
-    
-    # Check for "create issue"
-    elif create_issue_pattern.search(llm_response):
-        # Extract summary and description (you will need a more robust extraction)
-        summary = 'Default summary from LLM'  # Placeholder
-        description = 'Default description from LLM'  # Placeholder
-        return create_jira_issue(summary, description)
-    
-    return {'error': 'Unknown action'}
+    try:
+        # Parse the LLM response as JSON
+        response_data = json.loads(llm_response)
+        
+        # Extract the action field
+        action = response_data.get('action')
+        
+        if action == 'view_issues':
+            return view_issues()
+        elif action == 'create_issue':
+            summary = response_data.get('summary', 'Default summary from LLM')  # Placeholder
+            description = response_data.get('description', 'Default description from LLM')  # Placeholder
+            return create_jira_issue(summary, description)
+        else:
+            return {'error': 'Unknown action'}
+    except json.JSONDecodeError:
+        return {'error': 'Invalid JSON from LLM'}
 
 def connect_jira():
     jira_options = {'server': f"https://{os.getenv('JIRA_DOMAIN')}.atlassian.net"}

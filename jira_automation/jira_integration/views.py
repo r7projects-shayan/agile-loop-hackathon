@@ -43,12 +43,11 @@ def process_llm_prompt(request):
         try:
             data = json.loads(request.body)
             prompt = data.get('prompt')
-            if not prompt:
-                return HttpResponseBadRequest('Prompt is required.')
-            
-            result = handle_prompt(prompt)
-            return JsonResponse(result)
-        except Exception as e:
-            logger.error(f"Error processing LLM prompt: {e}")
-            return JsonResponse({'error': str(e)})
-    return JsonResponse({'error': 'Invalid request method'})
+            if prompt:
+                response = handle_prompt(prompt)
+                return JsonResponse(response, safe=False)
+            else:
+                return JsonResponse({'error': 'No prompt provided'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
