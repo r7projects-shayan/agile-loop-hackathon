@@ -5,6 +5,6 @@ EMAIL=email@example.com
 # Get project key here: https://support.atlassian.com/jira-core-cloud/docs/work-with-issues-in-jira-cloud/#Workingwithissues-Projectkeys
 JIRA_PROJECT_KEY=e.g ALH
 # Obtain API Token here: https://id.atlassian.com/manage-profile/security/api-tokens
-API_KEY=your-api-token
+JIRA_API_KEY=your-api-token
 # Get your Google Gemini API key here: https://makersuite.google.com/app/apikey
 GEMINI_API_KEY=
