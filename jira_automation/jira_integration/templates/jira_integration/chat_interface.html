@@ -1,9 +1,10 @@
+{% comment %} jira_automation/jira_integration/templates/jira_integration/chat_interface.html {% endcomment %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Chat Interface</title>
+    <title>Jira Chat Interface</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -107,7 +108,7 @@
     <div class="header">
         <div></div>
         <div class="logo"></div>
-        <div>ChatGPT</div>
+        <div>Jira Assistant</div>
     </div>
     <div class="chat-history" id="chatHistory">
         <!-- Chat messages will be inserted here -->
@@ -116,7 +117,7 @@
         <form id="chatForm">
             {% csrf_token %}
             <div class="input-box">
-                <input type="text" name="prompt" placeholder="Message ChatGPT">
+                <input type="text" name="prompt" placeholder="Message Jira Assistant">
                 <button type="submit">↑</button>
             </div>
         </form>
@@ -135,6 +136,26 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
     
+        function formatResponse(result) {
+            switch (result.action) {
+                case 'view_issues':
+                    return 'Here are the current Jira issues:\n' + 
+                        result.issues.map(issue => `- ${issue.key}: ${issue.summary} (${issue.status})`).join('\n');
+                case 'create_issue':
+                    return `Created a new Jira issue:\nKey: ${result.key}\nSummary: ${result.summary}\nDescription: ${result.description}`;
+                case 'get_issue_comments':
+                    return 'Comments:\n' + 
+                        result.comments.map(comment => `- ${comment.author}: ${comment.body}`).join('\n');
+                case 'add_comment':
+                case 'edit_comment':
+                    return result.message;
+                case 'get_issue_status':
+                    return `Issue status: ${result.status}`;
+                default:
+                    return 'Action completed successfully.';
+            }
+        }
+    
         chatForm.addEventListener('submit', async function(event) {
             event.preventDefault();
             const prompt = promptInput.value;
@@ -146,7 +167,6 @@
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
             try {
-                console.log('Sending request with prompt:', prompt);
                 const response = await fetch('{% url "process_llm_prompt" %}', {
                     method: 'POST',
                     headers: {
@@ -156,30 +176,15 @@
                     body: JSON.stringify({ prompt: prompt })
                 });
     
-                console.log('Response status:', response.status);
-                const responseText = await response.text();
-                console.log('Response text:', responseText);
-    
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
     
-                const result = JSON.parse(responseText);
+                const result = await response.json();
                 console.log('Parsed result:', result);
     
-                let assistantResponse;
-                if (result.action === 'view_issues') {
-                    assistantResponse = 'Here are the current Jira issues:\n' + 
-                        result.issues.map(issue => `- ${issue.key}: ${issue.summary} (${issue.status})`).join('\n');
-                } else if (result.action === 'create_issue') {
-                    assistantResponse = `Created a new Jira issue:\nSummary: ${result.summary}\nDescription: ${result.description}`;
-                } else if (result.action === 'chat') {
-                    assistantResponse = result.message;
-                } else {
-                    assistantResponse = 'I'm not sure how to handle that request.';
-                }
-    
-                addMessage(assistantResponse, false);
+                const formattedResponse = formatResponse(result);
+                addMessage(formattedResponse, false);
             } catch (error) {
                 console.error('Error:', error);
                 addMessage('Sorry, there was an error processing your request.', false);
