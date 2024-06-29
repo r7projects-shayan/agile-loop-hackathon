@@ -1,13 +1,25 @@
-import React from 'react';
-//import './App.css';
-import Routes from "./Routes";
-import { BrowserRouter as Router } from "react-router-dom";
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './App.css';
+import LandingPage from './pages/Landing';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
+import Home from './pages/Home';
+import Orders from './pages/Orders';
+import Notifications from './pages/Notifications'
 
 function App() {
   return (
     <Router>
-      <Routes />
+      <div className='h-full bg-[#0d0d0d] md:text-md text-sm '>
+        <Routes>
+          <Route path='/' element={<LandingPage />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/signup' element={<SignUp />} />
+          <Route path='/dashboard' element={<Home />} />
+          <Route path='/my-orders' element={<Orders />} />
+          <Route path='/notifications' element={<Notifications/>} />
+        </Routes>
+      </div>
     </Router>
   );
 }
