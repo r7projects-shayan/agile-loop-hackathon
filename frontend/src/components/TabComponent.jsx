@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaX } from 'react-icons/fa6';
+import { PiRocketLaunch } from "react-icons/pi";
+
+
 
 
 const TabComponent = () => {
@@ -79,28 +82,24 @@ const TabComponent = () => {
                     </div>
                 </div>
 
-                <div className='bg-[#0d0d0d] flex flex-row gap-2 mx-4 p-4 rounded-lg'>
-                    {tabs.map(tab => (
-                        activeTab === tab.id && (
-                            <div key={tab.id} className='flex w-[75%] flex-row'>
-                                <input
-                                    type="text"
-                                    className="bg-[#0d0d0d] text-gray-200 p-2 w-full outline-none"
-                                    value={tab.input}
-                                    onChange={(e) => handleInputChange(tab.id, e.target.value)}
-                                    placeholder={`Type your chat prompt here`}
-                                />
-
-                            </div>
-
-                        )
-                    ))}
+                <div className='bg-[#0d0d0d] flex flex-row gap-2 mx-4 p-4 rounded-lg justify-between'>
+                    <div className='flex flex-row gap-2 flex-grow'>
+                        {tabs.map(tab => (
+                            activeTab === tab.id && (
+                                <div key={tab.id} className='flex w-full flex-row'>
+                                    <input
+                                        type="text"
+                                        className="bg-[#0d0d0d] text-gray-200 p-2 w-full outline-none"
+                                        value={tab.input}
+                                        onChange={(e) => handleInputChange(tab.id, e.target.value)}
+                                        placeholder={`Type your chat prompt here`}
+                                    />
+                                </div>
+                            )
+                        ))}
+                    </div>
                     <div className='flex items-center'>
-                        <img
-                            className=""
-                            alt="Picture"
-                            src="images/picture1-1.png"
-                        />
+                        <PiRocketLaunch style={{ color: 'white', fontSize: '30px' }} className='w-8 h-10'/>
                     </div>
                 </div>
             </div>

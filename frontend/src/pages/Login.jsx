@@ -46,79 +46,84 @@ function Login() {
     };
 
     return (
-        <div className='text-gray-300  '>
-            <NavbarTwo />
-            <div className='max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8 flex md:flex-row flex-col gap-4 h-80 
-            items-center justify-center md:justify-between mb-4'>
-                <div className="">
-                    <div className="w-[30vw]">
-                        <img className="md:block hidden " alt="Mask group" src="images/mask-group.png" />
-                    </div>
-                    <div className=" [font-family:'Haskoy-ExtraBold',Helvetica] font-extrabold text-white
-                     md:text-[42px] text-[28px] ">
-                        Welcome Back!
-                    </div>
+<div className='text-gray-300 min-h-screen flex flex-col '>
+        <NavbarTwo />
+        <div className='container mx-auto px-4 py-8 flex-grow px-4 sm:px-6 lg:px-8' >
+          <div className='flex flex-col lg:flex-row gap-8 items-center justify-center lg:justify-between'>
+            {/* Left side - Welcome and Image */}
+            <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start">
+              <h1 className="font-['Haskoy-ExtraBold',Helvetica] font-extrabold text-white text-3xl sm:text-4xl lg:text-5xl mb-6 text-center lg:text-left">
+                Welcome Back!
+              </h1>
+              <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+                <img 
+                  className="w-full h-auto" 
+                  alt="Mask group" 
+                  src="/images/mask-group.png" 
+                />
+              </div>
+            </div>
+      
+            {/* Right side - Login Form */}
+            <div className='w-full lg:w-1/2 max-w-md'>
+              <form onSubmit={handleLogin} className='mb-8'>
+                <h2 className='mb-4 font-semibold text-2xl'>Login</h2>
+                {message && (
+                  <div>
+                    <p className='mb-2'>{message}</p>
+                  </div>
+                )}
+                <div className='mb-4'>
+                  <input
+                    placeholder='Email'
+                    className="w-full px-4 py-3 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
-                <form onSubmit={handleLogin} className='md:w-[38%] w-[80%]'>
-                    <h2 className='mb-4 font-semibold text-2xl'>Login</h2>
-                    {message ?
-                        <div>
-                            <p className='mb-2'>{message}</p>
-                        </div>
-                        : <div></div>}
-                    <div className='mb-4'>
-
-                        <input
-                            placeholder='Email'
-                            className="w-full px-3 py-3 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                    </div>
-                    <div className='mb-4'>
-
-                        <input
-                            placeholder='Password'
-                            className="w-full px-3 py-3 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-                    <button type="submit"
-                        className='bg-blue-500 w-28 mb-3 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300'
-                    >
-                        Login
-                    </button>
-                    <div className='flex flex-row gap-4  justify-center'>
-                        <p>Don't have an account ?</p>
-                        <a href='/signup' className='text-blue-500'>
-                            Sign Up
-                        </a>
-                    </div>
-                </form>
-
-
+                <div className='mb-4'>
+                  <input
+                    placeholder='Password'
+                    className="w-full px-4 py-3 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                <button type="submit"
+                  className='bg-blue-500 w-full px-6 py-2 mb-3 mt-4 text-white rounded-lg hover:bg-blue-700 transition duration-300'
+                >
+                  Login
+                </button>
+                <div className='flex flex-col sm:flex-row gap-2 sm:gap-4 items-center justify-center mt-6'>
+                  <p>Don't have an account?</p>
+                  <a href='/signup' className='text-blue-500'>
+                    Sign Up
+                  </a>
+                </div>
+              </form>
+      
+              {/* Social Login Options */}
+              <div className='text-center'>
+                <p className='text-2xl font-bold mb-4'>OR</p>
+                <div className='flex justify-center gap-8'>
+                  <a href='' className='transition-transform hover:scale-110'>
+                    <FaGoogle className='h-10 w-10'/>
+                  </a>
+                  <a href='' className='transition-transform hover:scale-110'>
+                    <FaApple className='h-10 w-10'/>
+                  </a>
+                  <a href='' className='transition-transform hover:scale-110'>
+                    <FaMicrosoft className='h-10 w-10'/>
+                  </a>
+                </div>
+              </div>
             </div>
-
-            <hr className='w-[92vw] mx-auto py-2 px-4'></hr>
-            <p className='text-2xl font-bold'>OR</p>
-
-            <div className='max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8 mb-6 flex flex-row gap-10
-            justify-center'>
-                <a href=''>
-                    <FaGoogle className='h-12 w-12'/>
-                </a>
-                <a href=''>
-                    <FaApple className='h-12 w-12'/>
-                </a>
-                <a href=''>
-                    <FaMicrosoft className='h-12 w-12'/>
-                </a>
-            </div>
-            <Footer />
+          </div>
         </div>
+        <Footer />
+      </div>
     )
 }
 
