@@ -1,32 +1,21 @@
-import React from "react";
-import { Link } from "react-router-dom";
-const Home = () => {
-    return (
-        <div style={{ height: "100vh", padding:"20px", backgroundColor: "#232323", color: "white" }}>
-            <h1 style={{ fontSize:"48px", marginBottom: "20px" }}>Homepage</h1>
-            <ul style={{ listStyle:"none", padding: "0" }}>
-                <li style={{ marginBottom: "10px" }}>
-                    <Link to="/welcomepage" style={{color: "#87CEFA", textDecoration: "none"}}>
-                        WelcomePage
-                    </Link>
-                </li>
-                <li style={{ marginBottom: "10px" }}>
-                    <Link to="/signupphase" style={{color: "#87CEFA", textDecoration: "none"}}>
-                        Signup              </Link>
-                </li>
-                <li style={{ marginBottom: "10px" }}>
-                    <Link to="/loginphase" style={{color: "#87CEFA", textDecoration: "none"}}>
-                        Login
-                    </Link>
-                </li>
-                <li style={{ marginBottom: "10px" }}>
-                    <Link to="/workspacephase" style={{color: "#87CEFA", textDecoration: "none"}}>
-                        WorkSpace
-                    </Link>
-                </li>
+import React from 'react';
+import Sidebar from '../components/SideBar';
+import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
+import TabComponent from '../components/TabComponent';
 
-            </ul>
+function Home() {
+    return (
+        <div className="flex flex-row min-h-screen">
+            <Sidebar/>
+            <div className="flex-1 bg-[#141414] flex flex-col">
+                <Navbar />
+                <div className="flex-1 p-4">
+                    <TabComponent />
+                </div>
+            </div>
         </div>
     );
-};
+}
+
 export default Home;
