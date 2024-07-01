@@ -1,11 +1,11 @@
 # Create a Jira Service Management domain here: https://www.atlassian.com/software/jira/service-management/free
 # e.g. google.atlassian.net -> "google" is the domain
-JIRA_DOMAIN=ichone
+JIRA_DOMAIN=YOUR_JIRA_DOMAIN
 # Use same email address used for Jira Service Management registration
-EMAIL=ichwanharyosembodo96@gmail.com
+EMAIL=YOUR_JIRA_EMAIL
 # Get project key here: https://support.atlassian.com/jira-core-cloud/docs/work-with-issues-in-jira-cloud/#Workingwithissues-Projectkeys
-JIRA_PROJECT_KEY=QUIX
+JIRA_PROJECT_KEY=YOUR_JIRA_PROJECT_KEY
 # Obtain API Token here: https://id.atlassian.com/manage-profile/security/api-tokens
-JIRA_API_KEY=ATATT3xFfGF06kw0lKSM564Q8sTMgZzTWhzUevuwExa6t-ZUb8j48oBnSBdrh6fFQ-09NpFNwpE0nawp_uyq8V2H7X9hqd9P9RBXAZYbEuDRc2YEdie0cswrTw61DZE6c5mveTgstfMXYN4ZLBSbEZQJVSCZ26yw3Qjyxeg4CkzwZVZOV11ELm0=3D2A38E9
+JIRA_API_KEY=YOUR_JIRA_API_KEY
 # Get your Google Gemini API key here: https://makersuite.google.com/app/apikey
-GEMINI_API_KEY=AIzaSyAxuEVUtPgkeQlrrdlnYsajqNrx_jWlLHE
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
