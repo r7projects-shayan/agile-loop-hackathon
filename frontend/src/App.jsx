@@ -5,7 +5,8 @@ import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import Home from './pages/Home';
 import Orders from './pages/Orders';
-import Notifications from './pages/Notifications'
+import Notifications from './pages/Notifications';
+import Leaderboard from './pages/leaderboard';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path='/dashboard' element={<Home />} />
           <Route path='/my-orders' element={<Orders />} />
           <Route path='/notifications' element={<Notifications/>} />
+          <Route path='/leaderboard' element={<Leaderboard/>} />
         </Routes>
       </div>
     </Router>
