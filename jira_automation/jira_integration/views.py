@@ -1,53 +1,53 @@
+from django.shortcuts import render
+from django.http import JsonResponse, HttpResponseBadRequest
+from jira import JIRA
+import os
+import json
+from dotenv import load_dotenv
+from .llm_utils import handle_prompt, view_issues, create_jira_issue
+from django.views.decorators.csrf import csrf_exempt
+import logging
 
+logger = logging.getLogger(__name__)
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .jira_client import JiraClient
-from .ai_client import AIClient
-from .serializers import TicketSerializer, TaskSerializer, IssueKeySerializer
+# Load environment variables
+load_dotenv()
 
-JIRA_SERVER = 'tj should do this one'
-JIRA_USERNAME = 'djpapzin do this'
-JIRA_API_TOKEN = 'djpapzin do this'
-AI_API_URL = 'ai api url'
-AI_API_KEY = 'put the ai api key'
+def jira_issues(request):
+    issues = view_issues()
+    return JsonResponse({'issues': issues})
 
-jira_client = JiraClient(JIRA_SERVER, JIRA_USERNAME, JIRA_API_TOKEN)
-ai_client = AIClient(AI_API_URL, AI_API_KEY)
+def create_issue_form(request):
+    return render(request, 'jira_integration/create_issue.html')
 
-class CreateTicketView(APIView):
-    def post(self, request):
-        serializer = TicketSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data
-            ticket = jira_client.create_ticket(data['project_key'], data['summary'], data['description'], data['issue_type'])
-            return Response(ticket.raw, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def create_jira_issue_view(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        summary = data.get('summary')
+        description = data.get('description')
 
-class AddTaskView(APIView):
-    def post(self, request):
-        serializer = TaskSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data
-            task = jira_client.add_task(data['issue_key'], data['summary'], data['description'])
-            return Response(task.raw, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if not summary or not description:
+            return HttpResponseBadRequest('Summary and description are required.')
 
-class GetCompletionDateView(APIView):
-    def post(self, request):
-        serializer = IssueKeySerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data
-            completion_date = jira_client.get_completion_date(data['issue_key'])
-            return Response({'completion_date': completion_date}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        issue = create_jira_issue(summary, description)
+        return JsonResponse(issue)
+    else:
+        return HttpResponseBadRequest('Only POST method is allowed.')
 
-class GetIssueDataView(APIView):
-    def post(self, request):
-        serializer = IssueKeySerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data
-            issue_data = jira_client.get_issue_data(data['issue_key'])
-            return Response(issue_data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def chat_interface(request):
+    return render(request, 'jira_integration/chat_interface.html')
+
+@csrf_exempt
+def process_llm_prompt(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            prompt = data.get('prompt')
+            if prompt:
+                response = handle_prompt(prompt)
+                return JsonResponse(response, safe=False)
+            else:
+                return JsonResponse({'error': 'No prompt provided'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
