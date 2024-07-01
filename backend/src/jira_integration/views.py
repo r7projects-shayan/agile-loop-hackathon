@@ -396,6 +396,12 @@ def process_llm_prompt(request):
                 return JsonResponse({"error": "Issue key not provided"}, status=400)
             status = get_issue_status(issue_key)
             return JsonResponse({"message": "Issue status retrieved", "status": status})
+        
+        if response["action"] == "fetch_database":
+            return JsonResponse({"message": "Notion database fetched", "data": response["data"]})
+        
+        if response["action"] == "fetch_page":
+            return JsonResponse({"message": "Notion page fetched", "data": response["data"]})
 
         # Handle other actions here
         

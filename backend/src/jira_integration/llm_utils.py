@@ -4,11 +4,21 @@ import google.generativeai as genai
 from google.api_core import exceptions as google_exceptions
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import os
+import sys
 import json
 import requests
 from jira import JIRA
 from dotenv import load_dotenv
 from typing import List, Dict, Any
+
+import sys
+import os
+
+# Append the parent directory to sys.path to allow for imports beyond the top-level package
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Now you can perform imports from the parent directory or other directories at the same level
+from notion_integration import notion_lib
 
 # Load environment variables
 load_dotenv()
@@ -111,12 +121,16 @@ def handle_prompt(prompt: str) -> Dict[str, Any]:
     try:
         response = model.generate_content(
             f"""
-            Analyze the following user prompt and determine the appropriate action:
+            Analyze the following user prompt and determine the which service and action that user want to use:
             
             {prompt}
             
-            Respond with a JSON object containing the action and any relevant parameters.
+            Respond with a JSON object containing the service, action and any relevant parameters.
             
+            Valid services are:
+            - "JIRA"
+            - "NOTION"
+
             Valid actions are:
             - "view_issues"
             - "create_issue"
@@ -127,6 +141,8 @@ def handle_prompt(prompt: str) -> Dict[str, Any]:
             - "add_comment"
             - "edit_comment"
             - "get_issue_status"
+            - "fetch_database"
+            - "fetch_page"
             
             Include relevant parameters for each action.
             """,
@@ -137,11 +153,18 @@ def handle_prompt(prompt: str) -> Dict[str, Any]:
                 HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE
             }
         )
-        
-        action_data = json.loads(response.text)
 
-        action = action_data.get('action')
-        parameters = action_data.get('parameters', {})
+        prompt_response = json.loads(response.text)
+        prompt_message_for_service = ""
+        service = prompt_response.get('service')
+
+        print(f"service: {service}")
+
+        if service != 'JIRA' and service != 'NOTION':
+            return {'action': 'error', 'message': 'Your intented service is not supported'}
+
+        action = prompt_response.get('action')
+        parameters = prompt_response.get('parameters', {})
         
         # Print the action and parameters
         print(f"Action: {action}, Parameters: {parameters}")
@@ -164,6 +187,10 @@ def handle_prompt(prompt: str) -> Dict[str, Any]:
             return {'action': action, 'comment': edit_comment(parameters.get('issue_key'), parameters.get('comment_id'), parameters.get('new_comment'))}
         elif action == 'get_issue_status':
             return {'action': action, 'status': get_issue_status(parameters.get('issue_key'))}
+        elif action == 'fetch_database':
+            return {'action': action, 'data': notion_lib.fetch_databases(parameters.get('database_id'))}
+        elif action == 'fetch_page':
+            return {'action': action, 'data': notion_lib.fetch_pages(parameters.get('page_id'))}
         else:
             return {'action': 'error', 'message': 'Invalid action'}
     
