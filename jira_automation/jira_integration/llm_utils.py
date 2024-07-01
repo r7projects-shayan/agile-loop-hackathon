@@ -1,5 +1,3 @@
-# jira_automation/jira_integration/llm_utils.py
-
 import google.generativeai as genai
 from google.api_core import exceptions as google_exceptions
 import os
@@ -36,7 +34,7 @@ def view_issues() -> List[Dict[str, Any]]:
     
     return issues_list
 
-def create_issue(summary: str, description: str) -> Dict[str, Any]:
+def create_jira_issue(summary: str, description: str) -> Dict[str, Any]:
     jira = connect_jira()
     issue_dict = {
         'project': {'key': os.getenv('JIRA_PROJECT_KEY')},
@@ -140,7 +138,7 @@ def handle_prompt(prompt: str) -> Dict[str, Any]:
         if action == 'view_issues':
             return {'action': action, 'issues': view_issues()}
         elif action == 'create_issue':
-            return {'action': action, 'issue': create_issue(parameters.get('summary'), parameters.get('description'))}
+            return {'action': action, 'issue': create_jira_issue(parameters.get('summary'), parameters.get('description'))}
         elif action == 'get_all_users':
             return {'action': action, 'users': get_all_users()}
         elif action == 'create_user':
