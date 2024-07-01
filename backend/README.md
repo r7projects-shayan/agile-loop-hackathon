@@ -2,8 +2,52 @@
 
 # Project Summary: Jira Issue Management with LLM Integration
 
+# How to run project
+## Requirements
+- Python 3
+- access to
+--- JIRA
+--- Gemini
+
+## Setting up environment
+
+Use virtual env to create an python development environment
+
+Create virtual env (venv) by running this command
+
+`python -m venv venv`
+
+and enable the virtual env by running this command
+
+`source venv/bin/activate`
+
+once you have enabled the virtual environment, install the modules defined in requirements.txt by running
+
+`pip install -r requirements.txt`
+
+### Setting up environment - Credentials
+
+Once you have installed all of the dependencies and setting up the virtual environment, you need to set up the project credentials through .env file
+
+follows template on `.env.copy` and fill with your project credentials and then create a new file with name `.env`
+
+## Running project
+
+to run the Django server by going to `/src` folder and run
+
+`python manage.py runserver` --> by default will run on port :8000
+
+before running for the first time, please do migration by running this command
+
+`python manage.py migrate`
+
+## Available interface
+| Feature       | Endpoint                 | Payload                                     |
+|---------------|--------------------------|---------------------------------------------|
+| LLM prompt    | POST /process-llm-prompt | JSON `{ "prompt": "<MESSAGE PROMPT HERE>" }`|
+
 ## Current State
-1. Basic Jira integration is implemented (view issues, create issues).
+1. Basic Jira integration is implemented (view issues).
 2. Django backend with endpoints for Jira operations.
 3. Initial LLM integration using Google's Gemini model.
 
@@ -52,45 +96,6 @@
 - Implement structured output using `response_mime_type` and `response_schema`.
 - Consider using typed dictionaries for structured responses.
 - Enhance error handling and logging throughout the application.
-
-# How to run project
-## Requirements
-- Python 3
-- access to
---- JIRA
---- Gemini
-
-## Setting up environment
-
-Use virtual env to create an python development environment
-
-Create virtual env (venv) by running this command
-
-`python -m venv venv`
-
-and enable the virtual env by running this command
-
-`source venv/bin/activate`
-
-once you have enabled the virtual environment, install the modules defined in requirements.txt by running
-
-`pip install -r requirements.txt`
-
-### Setting up environment - Credentials
-
-Once you have installed all of the dependencies and setting up the virtual environment, you need to set up the project credentials through .env file
-
-follows template on `.env.copy` and fill with your project credentials and then create a new file with name `.env`
-
-## Running project
-
-to run the Django server by going to `/src` folder and run
-
-`python manage.py runserver` --> by default will run on port :8000
-
-before running for the first time, please do migration by running this command
-
-`python manage.py migrate`
 
 
 # LLM Assistance (This is response from an LLM on how to move forward) 
