@@ -21,6 +21,7 @@
     "react-pro-sidebar": "^1.1.0",
     "react-router-dom": "^6.24.0",
     "react-speech-recognition": "^3.10.0",
+    "regenerator-runtime": "^0.14.1",
     "universal-cookie": "^7.1.4"
   },
   "devDependencies": {
