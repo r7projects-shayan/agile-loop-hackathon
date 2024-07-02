@@ -23,7 +23,7 @@ function Login() {
       navigate('/dashboard');
     } else {
       try {
-        const response = await axios.post(process.env.BACKEND_URL + '/api/auth/login/', {
+        const response = await axios.post(import.meta.env.BACKEND_URL + '/api/auth/login/', {
           email,
           password,
         });
