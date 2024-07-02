@@ -351,51 +351,51 @@ def process_llm_prompt(request):
         if response["action"] == "error":
             return JsonResponse(response, status=400)
         
-        # if response["action"] == "create_issue":
-        #     summary = response["parameters"].get("summary")
-        #     description = response["parameters"].get("description")
+        if response["action"] == "create_issue":
+            summary = response["issue"].get("summary")
+            description = response["issue"].get("description")
+            key = response["issue"].get("key")
             
-        #     if not summary or not description:
-        #         return JsonResponse({"error": "Invalid parameters for creating issue"}, status=400)
-            
-        #     # Call create_jira_issue and handle response
-        #     issue = create_jira_issue(summary, description)
-            
-        #     return JsonResponse({"message": "Issue created successfully", "issue": issue})
+            return JsonResponse({"message": "Issue created successfully", "issue": {
+                "key": key,
+                "summary": summary,
+                "description": description
+            }})
         
-        if response["action"] == "view_issues":
-            issues = view_issues()
-            return JsonResponse({"message": "Issues found", "issues": issues})
+        # TODO: implement these actions
+        # if response["action"] == "view_issues":
+        #     issues = view_issues()
+        #     return JsonResponse({"message": "Issues found", "issues": issues})
         
-        if response["action"] == "get_issue_comments":
-            issue_key = response["parameters"].get("issue_key")
-            if not issue_key:
-                return JsonResponse({"error": "Issue key not provided"}, status=400)
-            comments = get_issue_comments(issue_key)
-            return JsonResponse({"message": "Comments retrieved", "comments": comments})
+        # if response["action"] == "get_issue_comments":
+        #     issue_key = response["parameters"].get("issue_key")
+        #     if not issue_key:
+        #         return JsonResponse({"error": "Issue key not provided"}, status=400)
+        #     comments = get_issue_comments(issue_key)
+        #     return JsonResponse({"message": "Comments retrieved", "comments": comments})
         
-        if response["action"] == "add_comment":
-            issue_key = response["parameters"].get("issue_key")
-            comment = response["parameters"].get("comment")
-            if not issue_key or not comment:
-                return JsonResponse({"error": "Issue key or comment not provided"}, status=400)
-            comment_result = add_comment(issue_key, comment)
-            return JsonResponse({"message": comment_result["message"]})
+        # if response["action"] == "add_comment":
+        #     issue_key = response["parameters"].get("issue_key")
+        #     comment = response["parameters"].get("comment")
+        #     if not issue_key or not comment:
+        #         return JsonResponse({"error": "Issue key or comment not provided"}, status=400)
+        #     comment_result = add_comment(issue_key, comment)
+        #     return JsonResponse({"message": comment_result["message"]})
 
-        if response["action"] == "edit_comment":
-            issue_key = response["parameters"].get("issue_key")
-            comment = response["parameters"].get("comment")
-            if not issue_key or not comment:
-                return JsonResponse({"error": "Issue key or comment not provided"}, status=400)
-            edit_result = edit_comment(issue_key, comment)
-            return JsonResponse({"message": edit_result["message"]})
+        # if response["action"] == "edit_comment":
+        #     issue_key = response["parameters"].get("issue_key")
+        #     comment = response["parameters"].get("comment")
+        #     if not issue_key or not comment:
+        #         return JsonResponse({"error": "Issue key or comment not provided"}, status=400)
+        #     edit_result = edit_comment(issue_key, comment)
+        #     return JsonResponse({"message": edit_result["message"]})
 
-        if response["action"] == "get_issue_status":
-            issue_key = response["parameters"].get("issue_key")
-            if not issue_key:
-                return JsonResponse({"error": "Issue key not provided"}, status=400)
-            status = get_issue_status(issue_key)
-            return JsonResponse({"message": "Issue status retrieved", "status": status})
+        # if response["action"] == "get_issue_status":
+        #     issue_key = response["parameters"].get("issue_key")
+        #     if not issue_key:
+        #         return JsonResponse({"error": "Issue key not provided"}, status=400)
+        #     status = get_issue_status(issue_key)
+        #     return JsonResponse({"message": "Issue status retrieved", "status": status})
         
         if response["action"] == "fetch_database":
             return JsonResponse({"message": "Notion database fetched", "data": response["data"]})

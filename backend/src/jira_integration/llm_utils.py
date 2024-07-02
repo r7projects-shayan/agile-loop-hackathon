@@ -56,11 +56,17 @@ def create_issue(summary: str, description: str) -> Dict[str, Any]:
         'issuetype': {'name': 'Task'},
     }
     new_issue = jira.create_issue(fields=issue_dict)
+    print(new_issue)
+    print({
+        'key': new_issue.key,
+        'summary': summary,
+        'description': description,
+    })
 
     return {
         'key': new_issue.key,
-        'summary': new_issue.fields.summary,
-        'description': new_issue.fields.description,
+        'summary': summary,
+        'description': description,
     }
 
 def get_all_users() -> List[Dict[str, str]]:
@@ -173,20 +179,21 @@ def handle_prompt(prompt: str) -> Dict[str, Any]:
             return {'action': action, 'issues': view_issues()}
         elif action == 'create_issue':
             return {'action': action, 'issue': create_issue(parameters.get('summary'), parameters.get('description'))}
-        elif action == 'get_all_users':
-            return {'action': action, 'users': get_all_users()}
-        elif action == 'create_user':
-            return {'action': action, 'user': create_user(parameters.get('display_name'), parameters.get('email'), parameters.get('password'))}
-        elif action == 'add_file_attachment':
-            return {'action': action, 'attachment': add_file_attachment(parameters.get('issue_key'), parameters.get('file_path'))}
-        elif action == 'get_issue_comments':
-            return {'action': action, 'comments': get_issue_comments(parameters.get('issue_key'))}
-        elif action == 'add_comment':
-            return {'action': action, 'comment': add_comment(parameters.get('issue_key'), parameters.get('comment'))}
-        elif action == 'edit_comment':
-            return {'action': action, 'comment': edit_comment(parameters.get('issue_key'), parameters.get('comment_id'), parameters.get('new_comment'))}
-        elif action == 'get_issue_status':
-            return {'action': action, 'status': get_issue_status(parameters.get('issue_key'))}
+        # TODO: implement these actions
+        # elif action == 'get_all_users':
+        #     return {'action': action, 'users': get_all_users()}
+        # elif action == 'create_user':
+        #     return {'action': action, 'user': create_user(parameters.get('display_name'), parameters.get('email'), parameters.get('password'))}
+        # elif action == 'add_file_attachment':
+        #     return {'action': action, 'attachment': add_file_attachment(parameters.get('issue_key'), parameters.get('file_path'))}
+        # elif action == 'get_issue_comments':
+        #     return {'action': action, 'comments': get_issue_comments(parameters.get('issue_key'))}
+        # elif action == 'add_comment':
+        #     return {'action': action, 'comment': add_comment(parameters.get('issue_key'), parameters.get('comment'))}
+        # elif action == 'edit_comment':
+        #     return {'action': action, 'comment': edit_comment(parameters.get('issue_key'), parameters.get('comment_id'), parameters.get('new_comment'))}
+        # elif action == 'get_issue_status':
+        #     return {'action': action, 'status': get_issue_status(parameters.get('issue_key'))}
         elif action == 'fetch_database':
             return {'action': action, 'data': notion_lib.fetch_databases(parameters.get('database_id'))}
         elif action == 'fetch_page':
