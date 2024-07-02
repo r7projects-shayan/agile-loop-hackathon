@@ -55,12 +55,13 @@ def prompt_view(request):
             - "get issues"
             - "fetch_database"
             - "fetch_page"
+            -"create_page"
              
         Return a json object only. If the action is create then the data object should have the fields project,
         summary ,description and issue issuetype.if the action is assign then the data objects should be 
         issue, and assignee.If the action is get issues then it should the field project.if the action is
         fetch_database then the data should have database_id and if action is fetch_page then the 
-        data should have fetch_id.
+        data should have page_id.If action is create page then the data should have page_id, title and paragraph
         """
 
         # Use Google Gemini to process the prompt
@@ -104,6 +105,8 @@ def automate_jira_task(data):
         result = fetch_databases(task_data['database_id'])
     elif action == 'fetch_page':
         result = fetch_pages(task_data['page_id'])
+    elif action == 'create_page':
+        result = create_notion_page(task_data['page_id'],env("NOTION_API_KEY"),task_data['title'],task_data['paragraph'])
     else:
         print("No action detected")
     
@@ -162,6 +165,36 @@ def fetch_pages(pageId: str) -> Dict[str, Any]:
     response = requests.request("GET", url, headers=DEFAULT_NOTION_HEADERS, data=payload)
 
     return json.loads(response.text)
+
+def create_notion_page(page_id: str, notion_api_key: str, title: str, paragraph: str):
+    url = "https://api.notion.com/v1/pages"
+    headers = {
+        "Authorization": f"Bearer {notion_api_key}",
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28"
+    }
+    payload = {
+        "parent": { "page_id": page_id },
+        "properties": {
+            "title": {
+                "title": [{ "type": "text", "text": { "content": title } }]
+            }
+        },
+        "children": [
+            {
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": [{ "type": "text", "text": { "content": paragraph } }]
+                }
+            }
+        ]
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+    
+    return json.loads(response.text)
+    
 # class AddAppView(generics.CreateAPIView):
 #     queryset = App.objects.all()
 #     serializer_class = AppSerializer
