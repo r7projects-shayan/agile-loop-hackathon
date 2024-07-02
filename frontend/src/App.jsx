@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Orders from './pages/Orders';
 import Notifications from './pages/Notifications';
 import Leaderboard from './pages/leaderboard';
+import SpeechToText from './pages/SpeechToText';
 
 function App() {
   return (

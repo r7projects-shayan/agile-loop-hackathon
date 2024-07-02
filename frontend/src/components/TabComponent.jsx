@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FaPlus, FaX } from 'react-icons/fa6';
-import { PiRocketLaunch } from "react-icons/pi";
+import { PiRocketLaunch, PiMicrophone, PiStop } from "react-icons/pi";
 import axios from 'axios';
 import { JsonView, allExpanded, darkStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 const TabComponent = () => {
     const [activeTab, setActiveTab] = useState(0);
@@ -20,6 +21,28 @@ const TabComponent = () => {
             }
         }
     }, [tabs]);
+
+    const {
+        transcript,
+        listening,
+        resetTranscript,
+        browserSupportsSpeechRecognition
+    } = useSpeechRecognition();
+
+    useEffect(() => {
+        tabs.find(tab => tab.id === activeTab).input = transcript;
+    }, [transcript])
+
+    useEffect(() => {
+        if (!listening) {
+            // append space at the end of the transcript
+            tabs.find(tab => tab.id === activeTab).input += ' ';
+        }
+    }, [listening])
+    
+    if (!browserSupportsSpeechRecognition) {
+        return Alert('Hey quick notes, you cannot do speech to text since your browser does not support it, try to use other browsers :)');
+    }
 
     const addTab = () => {
         const newTab = {
@@ -44,10 +67,10 @@ const TabComponent = () => {
     };
 
     const handleSubmit = async () => {
-        const activeTabData = tabs.find(tab => tab.id === activeTab);
+        let activeTabData = tabs.find(tab => tab.id === activeTab);
+        
         if (activeTabData && activeTabData.input.trim()) {
             try {
-                console.log(activeTabData.input)
                 console.log(process.env)
                 const response = await axios.post(process.env.BACKEND_URL + '/api/process-llm-prompt', {
                     prompt: activeTabData.input
@@ -59,6 +82,9 @@ const TabComponent = () => {
                 const updatedTabs = tabs.map(tab =>
                     tab.id === activeTab ? { ...tab, input: "" } : tab
                 );
+
+                // reset transcript from voice to text
+                resetTranscript();
                 setTabs(updatedTabs);
             } catch (error) {
                 setJsonResponse(null);
@@ -126,7 +152,9 @@ const TabComponent = () => {
                             )
                         ))}
                     </div>
-                    <div className='flex items-center'>
+                    <div className='flex flex-row items-center'>
+                        {!listening && <PiMicrophone style={{ color: 'white', fontSize: '30px' }} className='w-8 h-10 mx-4' onClick={SpeechRecognition.startListening} /> }
+                        {listening && <PiStop style={{ color: 'white', fontSize: '30px' }} className='w-8 h-10 mx-4' onClick={SpeechRecognition.stopListening}/>}
                         <PiRocketLaunch style={{ color: 'white', fontSize: '30px' }} className='w-8 h-10' onClick={handleSubmit} />
                     </div>
                 </div>
