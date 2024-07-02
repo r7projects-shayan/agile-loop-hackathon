@@ -362,11 +362,11 @@ def process_llm_prompt(request):
                 "description": description
             }})
         
-        # TODO: implement these actions
-        # if response["action"] == "view_issues":
-        #     issues = view_issues()
-        #     return JsonResponse({"message": "Issues found", "issues": issues})
+        if response["action"] == "view_issues":
+            issues = view_issues()
+            return JsonResponse({"message": "Issues found", "issues": issues})
         
+        # TODO: implement these actions
         # if response["action"] == "get_issue_comments":
         #     issue_key = response["parameters"].get("issue_key")
         #     if not issue_key:
