@@ -48,7 +48,7 @@ const TabComponent = () => {
         if (activeTabData && activeTabData.input.trim()) {
             try {
                 console.log(activeTabData.input)
-                const response = await axios.post(process.env.url + '/api/process-llm-prompt', {
+                const response = await axios.post(process.env.BACKEND_URL + '/api/process-llm-prompt', {
                     prompt: activeTabData.input
                 });
 
