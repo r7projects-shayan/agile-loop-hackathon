@@ -47,9 +47,11 @@ const TabComponent = () => {
         const activeTabData = tabs.find(tab => tab.id === activeTab);
         if (activeTabData && activeTabData.input.trim()) {
             try {
-                const response = await axios.post('http://127.0.0.1:8000/api/tasks/user/add', {
+                console.log(activeTabData.input)
+                const response = await axios.post(process.env.url + '/api/process-llm-prompt', {
                     prompt: activeTabData.input
                 });
+
                 setJsonResponse(response.data);
                 setError(null);
                 // Clear input after successful submission

@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -71,7 +72,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+# Cors headers
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'jira_automation.urls'
 

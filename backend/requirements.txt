@@ -4,3 +4,4 @@ django
 djangorestframework
 google-generativeai
 jira
+django-cors-headers
