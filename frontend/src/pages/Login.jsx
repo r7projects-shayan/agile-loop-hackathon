@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
 import { FaApple, FaGoogle, FaMicrosoft } from 'react-icons/fa';
 import { FaApplePay } from 'react-icons/fa6';
+import 'regenerator-runtime/runtime'
 const cookies = new Cookies();
 
 function Login() {

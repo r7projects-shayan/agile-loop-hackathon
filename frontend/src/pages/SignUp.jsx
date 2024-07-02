@@ -4,6 +4,7 @@ import NavbarTwo from '../components/NavbarTwo';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
 import { FaApple, FaGoogle, FaMicrosoft } from 'react-icons/fa';
+import 'regenerator-runtime/runtime'
 
 function SignUp() {
     const [message, setMessage] = useState('');

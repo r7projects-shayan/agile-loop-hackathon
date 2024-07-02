@@ -5,6 +5,7 @@ import axios from 'axios';
 import { JsonView, allExpanded, darkStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import 'regenerator-runtime/runtime'
 
 const TabComponent = () => {
     const [activeTab, setActiveTab] = useState(0);
