@@ -10,6 +10,8 @@ import os
 from pathlib import Path
 from rest_framework.permissions import IsAdminUser, IsAuthenticated,AllowAny
 import requests
+from google.api_core import exceptions as google_exceptions
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
@@ -38,17 +40,39 @@ def prompt_view(request):
         prompt = data.get('prompt')
 
         # Define the schema for the task creation
-        schema = '{ "summary": str, "description": str, "project_key": str, "issue_type": str }'
+        #schema = '{ "summary": str, "description": str, "project_key": str, "issue_type": str }'
         gemini_prompt = f"""
-        Use this instruction [{prompt}] to create a complete jira task object  called data and a single required action object ie, 
-        action: create or action:assign and so on based on the instruction.Return a json object only. If the action
-        is create the the data object should have the fields project,summary ,description and issue issuetype.if
-        the aCtion is assign then the data objects should be  issue, and assignee.IF the action is get issues then 
-        it should the field project.
+        Analyze the prompt by user [{prompt}] to create a complete jira task object  called data and a single
+        Analyze the following user prompt and determine the which action that user want to use:
+            
+        {prompt}
+            
+        Respond with a JSON object containing the action and data.
+        
+        Valid actions are:
+            - "create"
+            - "assign"
+            - "get issues"
+            - "fetch_database"
+            - "fetch_page"
+             
+        Return a json object only. If the action is create then the data object should have the fields project,
+        summary ,description and issue issuetype.if the action is assign then the data objects should be 
+        issue, and assignee.If the action is get issues then it should the field project.if the action is
+        fetch_database then the data should have database_id and if action is fetch_page then the 
+        data should have fetch_id.
         """
 
         # Use Google Gemini to process the prompt
-        response = gemini_model.generate_content(gemini_prompt)
+        response = gemini_model.generate_content(
+            gemini_prompt,
+            generation_config=genai.GenerationConfig(
+                response_mime_type="application/json"
+            ),
+            safety_settings={
+                HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE
+            }
+            )
         task_info = json.loads(response.text)
         # res= JsonResponse({'data':task_info})
         # automate_jira_task(res)
@@ -76,6 +100,10 @@ def automate_jira_task(data):
         result = assign_jira_issue(jira, task_data['issue'], task_data['assignee'])
     elif action == 'get issues':
         result = get_issues(jira, task_data['project'])
+    elif action == 'fetch_database':
+        result = fetch_databases(task_data['database_id'])
+    elif action == 'fetch_page':
+        result = fetch_pages(task_data['page_id'])
     else:
         print("No action detected")
     
@@ -111,15 +139,29 @@ def get_issues(jira, project_key):
     return {'status': 'success', 'issues': issues_list}
 
 
-def get_developer_suggestions(task_points):
-        response = requests.post(
-            'https://api.synapse-copilot.com/analyze',
-            headers={'Authorization': f'Bearer {env("SYNAPSE_COPILOT_API_KEY")}'},
-            json={'task_points': task_points}
-        )
-        suggestions = response.json()
-        return suggestions
 
+#==============================================================================================
+#Notion
+NOTION_BASE_URL = "https://api.notion.com/v1"
+
+DEFAULT_NOTION_HEADERS = {
+    'Notion-Version': '2022-06-28',
+    'Authorization': 'Bearer ' + env("NOTION_API_KEY")
+}
+
+def fetch_databases(databaseId: str) -> Dict[str, Any]:
+    url = NOTION_BASE_URL + "/databases/" + databaseId
+    payload = {}
+    response = requests.request("GET", url, headers=DEFAULT_NOTION_HEADERS, data=payload)
+
+    return json.loads(response.text)
+
+def fetch_pages(pageId: str) -> Dict[str, Any]:
+    url = NOTION_BASE_URL + "/pages/" + pageId
+    payload = {}
+    response = requests.request("GET", url, headers=DEFAULT_NOTION_HEADERS, data=payload)
+
+    return json.loads(response.text)
 # class AddAppView(generics.CreateAPIView):
 #     queryset = App.objects.all()
 #     serializer_class = AppSerializer

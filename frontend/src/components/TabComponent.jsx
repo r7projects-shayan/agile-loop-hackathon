@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FaPlus, FaX } from 'react-icons/fa6';
 import { PiRocketLaunch } from "react-icons/pi";
-
-
-
+import axios from 'axios';
+import { JsonView, allExpanded, darkStyles } from 'react-json-view-lite';
+import 'react-json-view-lite/dist/index.css';
 
 const TabComponent = () => {
     const [activeTab, setActiveTab] = useState(0);
     const [tabs, setTabs] = useState([{ id: 0, name: "New Chat", input: "" }]);
+    const [jsonResponse, setJsonResponse] = useState(null);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (!tabs.find(tab => tab.id === activeTab)) {
@@ -17,7 +19,7 @@ const TabComponent = () => {
                 setActiveTab(null); // No tabs left, set activeTab to null
             }
         }
-    }, [tabs])
+    }, [tabs]);
 
     const addTab = () => {
         const newTab = {
@@ -37,17 +39,42 @@ const TabComponent = () => {
     };
 
     const removeTab = (id) => {
-        console.log(activeTab, 'original')
         const updatedTabs = tabs.filter(tab => tab.id !== id);
-
         setTabs(updatedTabs);
-
-
     };
+
+    const handleSubmit = async () => {
+        const activeTabData = tabs.find(tab => tab.id === activeTab);
+        if (activeTabData && activeTabData.input.trim()) {
+            try {
+                const response = await axios.post('http://127.0.0.1:8000/api/tasks/user/add', {
+                    prompt: activeTabData.input
+                });
+                setJsonResponse(response.data);
+                setError(null);
+                // Clear input after successful submission
+                const updatedTabs = tabs.map(tab =>
+                    tab.id === activeTab ? { ...tab, input: "" } : tab
+                );
+                setTabs(updatedTabs);
+            } catch (error) {
+                setJsonResponse(null);
+                setError('Failed to fetch data');
+            }
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSubmit();
+        }
+    };
+
+    const shouldExpandNode = useCallback(() => true, []);
 
     return (
         <div className='max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-10'>
-            <div className=" pb-4 md:w-[60%] h-[80vh] flex flex-col justify-between bg-[#202020] shadow-md rounded-lg">
+            <div className="pb-4 md:w-[60%] h-[80vh] flex flex-col justify-between bg-[#202020] shadow-md rounded-lg">
                 <div className="flex flex-col mb-4">
                     <div className='flex flex-row mb-4 bg-[#0d0d0d] rounded-t-lg'>
                         {tabs.map((tab, index) => (
@@ -56,29 +83,26 @@ const TabComponent = () => {
                                                 ${activeTab === tab.id ? 'bg-[#202020] text-gray-400' : 'bg-[#d0d0d0d] text-white'}`}
                                     onClick={() => setActiveTab(tab.id)}
                                 >
-                                    <p className='font-semibold ' >{tab.name}</p>
+                                    <p className='font-semibold'>{tab.name}</p>
                                     <button
-                                        className="px-2 py-2 text-red-500 "
+                                        className="px-2 py-2 text-red-500"
                                         onClick={() => removeTab(tab.id)}
                                     >
                                         <FaX className='h-2 w-2' />
                                     </button>
-
                                 </div>
-
                             </div>
                         ))}
                         <button
                             className="px-4 py-2 ml-2 text-white rounded"
                             onClick={addTab}
                         >
-
                             <FaPlus />
                         </button>
                     </div>
                     <div className='flex mx-4 items-center'>
-                        <img className="md:block hidden  p-2 w-[20vw]" alt="Mask group" src="images/mask-group.png" />
-                        <p className='text-xl text-gray-200 font-semibold'>Hi Darel <br /> How can i help you</p>
+                        <img className="md:block hidden p-2 w-[20vw]" alt="Mask group" src="images/mask-group.png" />
+                        <p className='text-xl text-gray-200 font-semibold'>Hi Darel <br /> How can I help you</p>
                     </div>
                 </div>
 
@@ -92,6 +116,7 @@ const TabComponent = () => {
                                         className="bg-[#0d0d0d] text-gray-200 p-2 w-full outline-none"
                                         value={tab.input}
                                         onChange={(e) => handleInputChange(tab.id, e.target.value)}
+                                        onKeyDown={handleKeyDown}
                                         placeholder={`Type your chat prompt here`}
                                     />
                                 </div>
@@ -99,13 +124,19 @@ const TabComponent = () => {
                         ))}
                     </div>
                     <div className='flex items-center'>
-                        <PiRocketLaunch style={{ color: 'white', fontSize: '30px' }} className='w-8 h-10'/>
+                        <PiRocketLaunch style={{ color: 'white', fontSize: '30px' }} className='w-8 h-10' onClick={handleSubmit} />
                     </div>
                 </div>
             </div>
-            <div className='p-4 md:w-[40%] bg-[#202020] shadow-md rounded-lg flex items-center 
-            justify-center text-gray-300'>
-                <p>Visualization here</p>
+            <div className='p-4 md:w-[40%] bg-[#202020] shadow-md rounded-lg flex items-center justify-center text-gray-300'>
+                {error && <p>{error}</p>}
+                {jsonResponse ? (
+                    <div className='flex items-start rounded-lg'>
+                    <JsonView data={jsonResponse} shouldExpandNode={shouldExpandNode} style={darkStyles} />
+                    </div>
+                ) : (
+                    <p>Visualization here</p>
+                )}
             </div>
         </div>
     );
